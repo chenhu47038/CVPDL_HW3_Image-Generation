@@ -1,143 +1,100 @@
-# CVPDL_HW3_Image-Generation
+# HW3 – DDPM on MNIST (from scratch)
 
+> 不使用預訓練權重、僅使用白名單套件；依作業規範生成 10,000 張 28×28 RGB PNG，並以 `pytorch-fid` 計算 FID。  
+> （規格與遞交格式請以課方簡報為準）
 
+---
 
-# HW3 – Diffusion Model for MNIST Image Generation
+## 0. 專案資料結構（訓練與取樣所需）
 
-## 1. Environment Setup
+project_root/
+├─ data/
+│ └─ mnist/ # MNIST 影像（RGB, 28x28, 以 png 命名）
+│ ├─ 00001.png
+│ ├─ 00002.png
+│ └─ ...
+├─ src/
+│ ├─ train.py # 訓練
+│ ├─ generate.py # 取樣（生成 10k）
+│ ├─ model_unet.py # 簡化 U-Net 與 t-embedding
+│ ├─ schedules.py # β/α/α_bar 等表格預先計算
+│ └─ utils.py # 影像 I/O、種子、日誌工具等
+├─ ckpt/ # 訓練權重輸出（會自動建立）
+└─ readme.md
 
-### (1) Install micromamba
+yaml
+複製程式碼
+
+> **訓練資料**與**FID 比對資料**都放在 `data/mnist/`（或你自行指定路徑）。  
+> 取樣輸出（10,000 張）會放到你用 `--outdir` 指定的資料夾（例如 `gen_images/`）。
+
+---
+
+## 1. 建環境（Python 3.10）
+
+### 1.1 使用 micromamba（建議）
 ```bash
 curl micro.mamba.pm/install.sh | bash
 source ~/.bashrc
-````
-
-### (2) Create environment
-
-```bash
 micromamba create -n hw3 python=3.10
 micromamba activate hw3
-```
-
-### (3) Install required packages
-
-```bash
+1.2 安裝白名單套件
+bash
+複製程式碼
 pip install torch torchvision
 pip install numpy pillow tqdm
 pip install pytorch-fid
-```
+# 可選（若要畫 loss 曲線）：
+# pip install tensorboard
+2. 準備資料集
+請將 MNIST（RGB 版，28×28）存成連號 png，放在：
 
----
-
-## 2. Dataset Preparation
-
-請先下載 MNIST RGB 版本（作業提供 Google Drive）：
-放置於：
-
-```
+bash
+複製程式碼
 data/mnist/
-    ├── 00001.png
-    ├── 00002.png
-    ...
-```
+  ├── 00001.png
+  ├── 00002.png
+  └── ...
+README 不附資料集；僅描述路徑（依課方規範）。
 
-README 不要附資料集，依照作業規範說明路徑即可。
-
----
-
-## 3. Training
-
-將所有程式碼放在 `src/` 資料夾。
-訓練指令：
-
-```bash
+3. 訓練
+bash
+複製程式碼
 python src/train.py \
-    --data_path data/mnist \
-    --epochs 100 \
-    --save_dir ckpt/
-```
+  --data_path data/mnist \
+  --epochs 100 \
+  --batch_size 128 \
+  --lr 1e-4 \
+  --save_dir ckpt/
+輸出：
 
-模型會輸出：
-
-```
+bash
+複製程式碼
 ckpt/model_final.pth
-```
-
----
-
-## 4. Generate 10,000 Images
-
-```bash
+4. 取樣（生成 10,000 張）
+bash
+複製程式碼
 python src/generate.py \
-    --ckpt ckpt/model_final.pth \
-    --num_images 10000 \
-    --outdir gen_images/
-```
+  --ckpt ckpt/model_final.pth \
+  --num_images 10000 \
+  --outdir gen_images/
+輸出結構（符合作業規範）：
 
-輸出格式需符合作業要求：
-
-```
+複製程式碼
 gen_images/
-    ├── 00001.png
-    ├── 00002.png
-    ...
-```
+  ├── 00001.png
+  ├── 00002.png
+  └── ...
+之後壓成 img_<student-id>.zip（zip 內不要子資料夾與額外檔案）。
 
-之後 zip 成：
+5. 計算 FID
+方法一：與訓練資料夾直接比較
 
-```
-img_<student-id>.zip
-```
-
----
-
-## 5. Compute FID
-
-### 方法一：與 MNIST 原圖比較
-
-```bash
+bash
+複製程式碼
 python -m pytorch_fid gen_images/ data/mnist/
-```
+方法二：與提供的 mnist.npz（預計算均值/共變異）比較
 
-### 方法二：使用 mnist.npz（作業提供）
-
-```bash
+bash
+複製程式碼
 python -m pytorch_fid gen_images/ mnist.npz
-```
-
----
-
-## 6. File Structure for Submission
-
-```
-hw3_<student-id>.zip
-│── hw3_<student-id>/
-│     ├── report_<student-id>.pdf
-│     ├── code_<student-id>.zip
-│     │      └── src/*
-│     ├── img_<student-id>.zip
-│           └── 00001.png ~ 10000.png
-```
-
----
-
-## 7. Notes
-
-* 不得使用 pretrained model
-* 不得使用外部 dataset
-* Python >= 3.10
-* 請遵守作業格式，否則會被扣分
-
-```
-
----
-
-如果你需要：
-
-✅ 我幫你把 **report 轉成 PDF**  
-✅ 幫你做 **diffusion 過程 8×8 圖**  
-✅ 幫你畫 **DDPM 架構圖（照我上面寫的 prompt）**  
-✅ 幫你把你的程式碼寫成更乾淨完整版本  
-
-只要告訴我，我都能立即幫你完成。
-```
