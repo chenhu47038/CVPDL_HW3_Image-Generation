@@ -1,30 +1,36 @@
-# HW3 – DDPM on MNIST (from scratch)
+# HW3 – DDPM on MNIST 
 
 
 
 ---
 
-## 0. 專案資料結構（訓練與取樣所需）
+## 0. 專案資料結構
+請先將附件的檔案依下列資料結構擺放：
 ```bash
 project_root/
 ├─ data/
-│ └─ mnist/ # MNIST 影像（RGB, 28x28, 以 png 命名）
-│ ├─ 00001.png
-│ ├─ 00002.png
-│ └─ ...
+│  ├─ 00001.png
+│  ├─ 00002.png
+│  └─ ...
 ├─ src/
 │ ├─ train.py # 訓練
-│ ├─ generate.py # 取樣（生成 10k）
+│ ├─ sample.py # 生成
 │ ├─ model_unet.py # 簡化 U-Net 與 t-embedding
-│ ├─ schedules.py # β/α/α_bar 等表格預先計算
-│ └─ utils.py # 影像 I/O、種子、日誌工具等
+│ ├─ noise_schedule.py # β/α/α_bar 等表格預先計算
+│ ├─ utils.py # 影像 I/O、種子、日誌工具等
+│ ├─ dataset.py
+│ ├─ ddpm.py
+│ ├─viz_diffusion.py #製作可視化
+│ └─ train_ddpm.sh
 ├─ ckpt/ # 訓練權重輸出（會自動建立）
+├─ mnist.npz #之後拿來用fid的
 └─ readme.md
+
 ```
 
 
-> **訓練資料**與**FID 比對資料**都放在 `data/mnist/`（或你自行指定路徑）。  
-> 取樣輸出（10,000 張）會放到你用 `--outdir` 指定的資料夾（例如 `gen_images/`）。
+> **訓練資料**都放在 `data/`（或你自行指定路徑）。  
+> 生成輸出（10,000 張）會放到你用 `out_imgs/` 
 
 ---
 
@@ -57,29 +63,38 @@ data/mnist/
 ```
 
 ## 3. 訓練
+schedule=1的時候是cosine，schedule=0是linear，可更改。
 ```bash
-python src/train.py \
-  --data_path data/mnist \
-  --epochs 100 \
-  --batch_size 128 \
-  --lr 1e-4 \
-  --save_dir ckpt/
+python -u src/train.py \
+  --data-root ~project_root/data \
+  --epochs 50 \
+  --batch-size 128 \
+  --lr 2e-4 \
+  --logdir runs/ddpm_cosine_T1000_b512 \#或是自己改一下名字
+  --save-every 20 \ #存中間的weight
+  --num-workers 4 \
+  --T 1000 \
+  --schedule 1 \ #可改
+  --seed 3407
 ```
 輸出：
 ```bash
-ckpt/model_final.pth
+runs/ddpm_cosine_T1000_b512/ckpt/model_final.pth
 ```
 
-## 4. 取樣（生成 10,000 張）
+## 4. 生成 10,000 張
+這邊以我剛剛用的ddpm_cosine_T1000_b512為例，有別的記得改名字
 ```bash
-python src/generate.py \
-  --ckpt ckpt/model_final.pth \
-  --num_images 10000 \
-  --outdir gen_images/
+python -u src/sample.py \
+  --ckpt runs/ddpm_cosine_T1000_b512/ckpt/ddpm_epoch_50.pt \
+  --n-samples 10000 \
+  --out-dir out_imgs_cosine \ #等等資料夾的名字 可改
+  --batch-size 256 \
+  --T 1000
 ```
 輸出結構：
 ```
-gen_images/
+out_imgs_cosine/ #剛剛用的名字
   ├── 00001.png
   ├── 00002.png
   └── ...
