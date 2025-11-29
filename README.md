@@ -21,8 +21,7 @@ project_root/
 ├─ ckpt/ # 訓練權重輸出（會自動建立）
 └─ readme.md
 ```
-yaml
-複製程式碼
+
 
 > **訓練資料**與**FID 比對資料**都放在 `data/mnist/`（或你自行指定路徑）。  
 > 取樣輸出（10,000 張）會放到你用 `--outdir` 指定的資料夾（例如 `gen_images/`）。
@@ -37,63 +36,61 @@ curl micro.mamba.pm/install.sh | bash
 source ~/.bashrc
 micromamba create -n hw3 python=3.10
 micromamba activate hw3
-1.2 安裝白名單套件
-bash
-複製程式碼
+```
+### 1.2 安裝白名單套件
+```bash
 pip install torch torchvision
 pip install numpy pillow tqdm
 pip install pytorch-fid
 # 可選（若要畫 loss 曲線）：
 # pip install tensorboard
-2. 準備資料集
-請將 MNIST（RGB 版，28×28）存成連號 png，放在：
+```
 
-bash
-複製程式碼
+### 2. 準備資料集
+請將 MNIST（RGB 版，28×28）存成連號 png，放在：
+```bash
+
 data/mnist/
   ├── 00001.png
   ├── 00002.png
   └── ...
-README 不附資料集；僅描述路徑（依課方規範）。
+```
 
-3. 訓練
-bash
-複製程式碼
+### 3. 訓練
+```bash
 python src/train.py \
   --data_path data/mnist \
   --epochs 100 \
   --batch_size 128 \
   --lr 1e-4 \
   --save_dir ckpt/
+```
 輸出：
-
-bash
-複製程式碼
+```bash
 ckpt/model_final.pth
-4. 取樣（生成 10,000 張）
-bash
-複製程式碼
+```
+
+### 4. 取樣（生成 10,000 張）
+```bash
 python src/generate.py \
   --ckpt ckpt/model_final.pth \
   --num_images 10000 \
   --outdir gen_images/
-輸出結構（符合作業規範）：
-
-複製程式碼
+```
+輸出結構：
+```
 gen_images/
   ├── 00001.png
   ├── 00002.png
   └── ...
-之後壓成 img_<student-id>.zip（zip 內不要子資料夾與額外檔案）。
-
-5. 計算 FID
+```
+### 5. 計算 FID
 方法一：與訓練資料夾直接比較
-
-bash
-複製程式碼
+```bash
 python -m pytorch_fid gen_images/ data/mnist/
-方法二：與提供的 mnist.npz（預計算均值/共變異）比較
+```
 
-bash
-複製程式碼
+方法二：與提供的 mnist.npz（預計算均值/共變異）比較
+```bash
 python -m pytorch_fid gen_images/ mnist.npz
+```
