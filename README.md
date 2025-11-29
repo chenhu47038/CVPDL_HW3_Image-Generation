@@ -20,9 +20,9 @@ project_root/
 │ ├─ utils.py # 影像 I/O、種子、日誌工具等
 │ ├─ dataset.py
 │ ├─ ddpm.py
-│ ├─viz_diffusion.py #製作可視化
+│ ├─ viz_diffusion.py #製作可視化
 │ └─ train_ddpm.sh
-├─ ckpt/ # 訓練權重輸出（會自動建立）
+├─ runs/專案名字/ckpt/ # 訓練權重輸出（會自動建立）
 ├─ mnist.npz #之後拿來用fid的
 └─ readme.md
 
