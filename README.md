@@ -46,7 +46,7 @@ pip install pytorch-fid
 # pip install tensorboard
 ```
 
-### 2. 準備資料集
+## 2. 準備資料集
 請將 MNIST（RGB 版，28×28）存成連號 png，放在：
 ```bash
 
@@ -56,7 +56,7 @@ data/mnist/
   └── ...
 ```
 
-### 3. 訓練
+## 3. 訓練
 ```bash
 python src/train.py \
   --data_path data/mnist \
@@ -70,7 +70,7 @@ python src/train.py \
 ckpt/model_final.pth
 ```
 
-### 4. 取樣（生成 10,000 張）
+## 4. 取樣（生成 10,000 張）
 ```bash
 python src/generate.py \
   --ckpt ckpt/model_final.pth \
@@ -84,7 +84,7 @@ gen_images/
   ├── 00002.png
   └── ...
 ```
-### 5. 計算 FID
+## 5. 計算 FID
 方法一：與訓練資料夾直接比較
 ```bash
 python -m pytorch_fid gen_images/ data/mnist/
