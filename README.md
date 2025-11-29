@@ -1,7 +1,6 @@
 # HW3 – DDPM on MNIST (from scratch)
 
-> 不使用預訓練權重、僅使用白名單套件；依作業規範生成 10,000 張 28×28 RGB PNG，並以 `pytorch-fid` 計算 FID。  
-> （規格與遞交格式請以課方簡報為準）
+
 
 ---
 
@@ -21,7 +20,7 @@ project_root/
 │ └─ utils.py # 影像 I/O、種子、日誌工具等
 ├─ ckpt/ # 訓練權重輸出（會自動建立）
 └─ readme.md
-
+```
 yaml
 複製程式碼
 
