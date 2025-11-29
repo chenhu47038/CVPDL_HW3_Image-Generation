@@ -6,7 +6,7 @@
 ---
 
 ## 0. 專案資料結構（訓練與取樣所需）
-
+```bash
 project_root/
 ├─ data/
 │ └─ mnist/ # MNIST 影像（RGB, 28x28, 以 png 命名）
