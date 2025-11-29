@@ -2,7 +2,6 @@
 
 
 
-````markdown
 # HW3 – Diffusion Model for MNIST Image Generation
 
 ## 1. Environment Setup
